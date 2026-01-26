@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>心情记录表单</title>
+    <style>
+        .container {
+            width: 550px;
+            margin: 50px auto;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; color: #333; margin-bottom: 30px;">心情记录</h2>
+        <!-- 表单核心：提交到 /mood/submit，请求方式为 POST -->
+        <form th:action="@{/mood/submit}" method="post">
+            <!-- 第一个输入框：发生的事 -->
+            <div class="form-item">
+                <label for="happenThing">发生的事：</label>
+                <input type="text" id="happenThing" name="happenThing" placeholder="请输入发生的事（可选）">
+            </div>
+            <!-- 第二个输入框：现在的心情 -->
+            <div class="form-item">
+                <label for="mood">现在的心情：</label>
+                <input type="text" id="mood" name="mood" placeholder="请输入你的心情（可选）">
+            </div>
+            <!-- 第三个输入框：心中对方的形象 -->
+            <div class="form-item">
+                <label for="partnerImage">心中对方的形象：</label>
+                <input type="text" id="partnerImage" name="partnerImage" placeholder="请输入心中对方的形象（可选）">
+            </div>
+            <!-- 提交按钮 -->
+            <button type="submit">提交记录</button>
+        </form>
+    </div>
+</body>
+</html>

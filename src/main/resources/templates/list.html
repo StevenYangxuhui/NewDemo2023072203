@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>心情记录列表</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .header-actions {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            margin-left: 10px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button-success {
+            background-color: #28a745;
+        }
+        .button-success:hover {
+            background-color: #218838;
+        }
+        .button-danger {
+            background-color: #dc3545;
+        }
+        .button-danger:hover {
+            background-color: #c82333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-message-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .action-buttons {
+            white-space: nowrap;
+        }
+        .action-buttons a {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>心情记录列表</h1>
+        
+        <div class="header-actions">
+            <a th:href="@{/}" class="button">回到主页</a>
+            <a th:href="@{/mood}" class="button button-success">新增记录</a>
+        </div>
+
+        <div th:if="${records != null and !records.isEmpty()}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>发生的事</th>
+                        <th>心情</th>
+                        <th>对方形象</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="record : ${records}">
+                        <td th:text="${record.id}">1</td>
+                        <td th:text="${record.happenThing != null ? record.happenThing : '(无)'}">发生的事</td>
+                        <td th:text="${record.mood != null ? record.mood : '(无)'}">心情</td>
+                        <td th:text="${record.partnerImage != null ? record.partnerImage : '(无)'}">对方形象</td>
+                        <td th:text="${#temporals.format(record.createTime, 'yyyy-MM-dd HH:mm:ss')}">2026-01-23 15:00:00</td>
+                        <td class="action-buttons">
+                            <a th:href="@{/mood/delete(id=${record.id})}" 
+                               class="button button-danger" 
+                               onclick="return confirm('确定要删除这条记录吗？')">删除</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${records == null or records.isEmpty()}" class="empty-message">
+            <div class="empty-message-icon">📝</div>
+            <p>暂无记录</p>
+            <a th:href="@{/mood}" class="button button-success">去创建第一条记录</a>
+        </div>
+    </div>
+</body>
+</html>
