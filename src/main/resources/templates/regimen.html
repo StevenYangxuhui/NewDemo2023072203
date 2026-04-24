@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>我的化疗方案 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; box-sizing: border-box; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .intro {
+            background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 12px 14px;
+            font-size: 14px; color: #1e3a5f; line-height: 1.55; margin-bottom: 16px;
+        }
+        .head-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .title { font-size: 20px; font-weight: 600; color: #111827; }
+        .btn {
+            display: inline-block; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600;
+            text-decoration: none; text-align: center; border: none; cursor: pointer; transition: transform .08s, box-shadow .12s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,.35); }
+        .btn-primary:hover { filter: brightness(1.03); transform: translateY(-1px); }
+        .btn-ghost { background: #fff; color: #374151; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+        .btn-ghost:hover { background: #f9fafb; }
+        .btn-sm { padding: 6px 12px; font-size: 13px; font-weight: 500; }
+        .btn-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .btn-danger:hover { background: #fee2e2; }
+        .flash { padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; font-size: 14px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .card {
+            background: #fff; border-radius: 14px; padding: 16px 14px; margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(15,23,42,.1); border: 1px solid #f3f4f6;
+        }
+        .card-title { font-size: 17px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: #6b7280; margin-bottom: 10px; }
+        .meta { font-size: 13px; color: #6b7280; line-height: 1.6; }
+        .meta strong { color: #374151; font-weight: 500; }
+        .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .empty { text-align: center; padding: 28px 16px; color: #6b7280; font-size: 14px; background: #fff; border-radius: 14px; border: 1px dashed #e5e7eb; }
+        .footer-nav { margin-top: 20px; text-align: center; }
+        .footer-nav a { color: #2563eb; font-size: 14px; text-decoration: none; }
+        .footer-nav a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="intro">
+        您<strong>不用自己编化疗方案</strong>，只要选对和医生说法最接近的一项即可。下面的日期、第几周期等<strong>不知道可以空着</strong>，以后想起来再改。
+        所有用药以<strong>医院单据和医嘱</strong>为准，这里只做提醒参考。
+    </div>
+    <div class="head-row">
+        <div class="title">我的化疗方案</div>
+        <a th:href="@{/regimen/choose}" class="btn btn-primary">选择我的方案</a>
+    </div>
+    <p th:if="${error}" class="flash" th:text="${error}">错误信息</p>
+    <div th:if="${regimens == null or regimens.isEmpty()}" class="empty">
+        还没有保存方案。点右上角「选择我的方案」，从常见选项里挑一个最像您正在做的即可。
+    </div>
+    <div th:each="r : ${regimens}" class="card">
+        <div class="card-title" th:text="${regimenCatalog.resolveListTitle(r)}">方案名</div>
+        <div class="card-sub" th:if="${regimenCatalog.resolveSubtitle(r) != null}" th:text="${regimenCatalog.resolveSubtitle(r)}">副标题</div>
+        <div class="meta">
+            <div><strong>开始治疗的日期</strong>（若已填）：
+                <span th:text="${r.startDate != null} ? ${#temporals.format(r.startDate, 'yyyy-MM-dd')} : '还没填'">—</span>
+            </div>
+            <div><strong>周期进度</strong>：
+                第 <span th:text="${r.currentCycle != null} ? ${r.currentCycle} : '—'">—</span> 周期
+                （共计划 <span th:text="${r.totalCycles != null} ? ${r.totalCycles} : '—'">—</span> 周期）
+                · 本周期第 <span th:text="${r.currentDay != null} ? ${r.currentDay} : '—'">—</span> 天
+            </div>
+            <div th:if="${r.note != null and !r.note.isEmpty()}"><strong>我的备注</strong>：<span th:text="${r.note}">—</span></div>
+        </div>
+        <div th:if="${medsByRegimen != null and medsByRegimen.containsKey(r.id) and !#lists.isEmpty(medsByRegimen.get(r.id))}"
+             style="margin-top:12px;padding-top:12px;border-top:1px solid #f3f4f6;font-size:13px;color:#374151;">
+            <strong>参考用药与剂量说明</strong>（来自所选方案，以医嘱为准）
+            <ul style="margin:8px 0 0;padding-left:18px;line-height:1.5;">
+                <li th:each="m : ${medsByRegimen.get(r.id)}">
+                    <span th:text="${m.drugName}">药</span>
+                    <span th:if="${m.dose != null}" th:text="' · ' + ${m.dose}"></span>
+                    <span th:if="${m.route != null}" th:text="' · ' + ${m.route}"></span>
+                </li>
+            </ul>
+            <p style="margin:8px 0 0;font-size:12px;color:#6b7280;">保存方案时，系统已按药名关联「营养与药物」知识库；完整报告见「营养与药物相互作用」页。</p>
+        </div>
+        <div class="actions">
+            <a th:href="@{/regimen/progress(regimenId=${r.id})}" class="btn btn-ghost btn-sm">改日期 / 周期</a>
+            <a th:href="@{/interaction}" class="btn btn-ghost btn-sm">营养与药物报告</a>
+            <form th:action="@{/regimen/delete}" method="post" style="display:inline;"
+                  onsubmit="return confirm('确定删除这条方案？下面的参考用药也会一起删掉。');">
+                <input type="hidden" name="regimenId" th:value="${r.id}">
+                <button type="submit" class="btn btn-danger btn-sm">删除</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer-nav">
+        <a th:href="@{/home}">← 返回功能首页</a>
+    </div>
+</div>
+</body>
+</html>

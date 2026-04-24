@@ -2,23 +2,32 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>心情记录</title>
+    <!-- 让页面根据手机宽度自适应缩放 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>CancerApp · 化疗营养助手</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
             padding: 20px;
+            /* 让内容在整个屏幕中水平 + 垂直居中 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
         .container {
-            width: 520px;
-            margin: 80px auto;
-            padding: 40px;
+            width: 100%;
+            max-width: 520px;
+            padding: 32px 20px;
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 12px;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
             text-align: center;
+            box-sizing: border-box;
         }
         .prompt {
             font-size: 20px;
@@ -39,6 +48,38 @@
         .btn:hover {
             background: #0056b3;
         }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .nav-item {
+            padding: 12px 10px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            background: #f9fafb;
+            text-align: left;
+            cursor: pointer;
+            text-decoration: none;
+            color: #111827;
+            transition: box-shadow 0.15s, transform 0.1s, background 0.15s;
+        }
+        .nav-item:hover {
+            background: #eef2ff;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+            transform: translateY(-1px);
+        }
+        .nav-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .nav-desc {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
         .link-record {
             display: block;
             margin-top: 20px;
@@ -53,9 +94,41 @@
 </head>
 <body>
     <div class="container">
-        <p class="prompt">今天有什么事想记录嘛？</p>
-        <a th:href="@{/mood}" class="btn">去记录</a>
-        <a th:href="@{/mood/list}" class="link-record">查看记录</a>
+        <p class="prompt">
+            CancerApp · 化疗营养助手<br>
+            这里是你和家属的「化疗营养作战图」
+        </p>
+
+        <div class="nav-grid">
+            <a th:href="@{/patient}" class="nav-item">
+                <div class="nav-title">患者信息</div>
+                <div class="nav-desc">基本信息、肝肾功能、过敏史、饮食禁忌</div>
+            </a>
+            <a th:href="@{/regimen}" class="nav-item">
+                <div class="nav-title">化疗方案</div>
+                <div class="nav-desc">从常见方案里选最像的一种，查看参考用药</div>
+            </a>
+            <a th:href="@{/interaction}" class="nav-item">
+                <div class="nav-title">营养相互作用</div>
+                <div class="nav-desc">红/黄/绿风险提示，吃什么、慎用什么</div>
+            </a>
+            <a th:href="@{/daily-plan}" class="nav-item">
+                <div class="nav-title">每日营养方案</div>
+                <div class="nav-desc">化疗前中后，动态饮食建议</div>
+            </a>
+            <a th:href="@{/reaction}" class="nav-item">
+                <div class="nav-title">不良反应记录</div>
+                <div class="nav-desc">恶心、腹泻、乏力等记录与干预</div>
+            </a>
+            <a th:href="@{/supplement-check}" class="nav-item">
+                <div class="nav-title">保健品风险自查</div>
+                <div class="nav-desc">输入保健品名称，判断可用/慎用/禁用</div>
+            </a>
+            <a th:href="@{/settings}" class="nav-item">
+                <div class="nav-title">我的 / 设置</div>
+                <div class="nav-desc">修改信息、数据保存与帮助说明</div>
+            </a>
+        </div>
     </div>
 </body>
 </html>

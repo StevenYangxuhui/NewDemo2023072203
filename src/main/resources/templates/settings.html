@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>我的 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+        .sub { font-size: 14px; color: #6b7280; margin-bottom: 20px; }
+        .panel { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+        .panel h2 { font-size: 15px; margin: 0 0 12px; color: #111827; }
+        .link-list a {
+            display: block; padding: 12px 0; border-bottom: 1px solid #f3f4f6; color: #2563eb; text-decoration: none; font-size: 15px; font-weight: 500;
+        }
+        .link-list a:last-child { border-bottom: none; }
+        .link-list a:hover { text-decoration: underline; }
+        .disclaimer { font-size: 13px; color: #4b5563; line-height: 1.6; }
+        .btn-out { width: 100%; padding: 12px; margin-top: 8px; border-radius: 999px; border: 1px solid #fecaca; background: #fef2f2; color: #b91c1c; font-size: 15px; font-weight: 600; cursor: pointer; }
+        .footer { margin-top: 20px; text-align: center; }
+        .footer a { color: #2563eb; font-size: 14px; text-decoration: none; }
+        .help-block { font-size: 14px; color: #374151; line-height: 1.65; }
+        .help-block p { margin: 0 0 10px; }
+        .help-block ul { margin: 0; padding-left: 1.2em; }
+        .help-block li { margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">我的</div>
+    <p class="sub" th:if="${loggedIn}">当前登录姓名：<strong th:text="${userName}">—</strong></p>
+    <p class="sub" th:if="${not loggedIn}">未登录时仅能浏览部分说明，使用记录功能请先<a th:href="@{/login}">登录</a>。</p>
+
+    <div class="panel" th:if="${loggedIn}">
+        <h2>资料与记录</h2>
+        <div class="link-list">
+            <a th:href="@{/patient}">患者信息（身体情况、过敏、饮食禁忌）</a>
+            <a th:href="@{/regimen}">化疗方案</a>
+            <a th:href="@{/reaction}">不良反应记录</a>
+            <a th:href="@{/daily-plan}">每日营养方案</a>
+            <a th:href="@{/supplement-check}">保健品自查</a>
+            <a th:href="@{/interaction}">营养与药物总览</a>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>帮助与使用指南</h2>
+        <div class="help-block">
+            <p><strong>建议顺序：</strong></p>
+            <ul>
+                <li>先完善<strong>患者信息</strong>（身体指标、过敏与禁忌），便于估算营养需求。</li>
+                <li>在<strong>化疗方案</strong>中填写或选择当前用药与周期。</li>
+                <li>打开<strong>营养-药物相互作用</strong>查看红/黄/绿风险提示。</li>
+                <li>每日查看<strong>每日营养方案</strong>；有不适时在<strong>不良反应</strong>中记录，系统会尽量合并到当日饮食建议。</li>
+                <li>服用保健品前用<strong>保健品自查</strong>做一次粗筛，仍须以医护意见为准。</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>说明</h2>
+        <div class="disclaimer">
+            CancerApp 用于帮助整理化疗期间的营养与用药<strong>参考信息</strong>，不能替代医院诊断与治疗决策。
+            任何药物、保健品、饮食调整请以<strong>主治医生、药师、营养师</strong>的指导为准。
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>关于本系统</h2>
+        <div class="help-block">
+            <p><strong>CancerApp</strong>：面向化疗期间的营养与用药辅助记录工具，整合患者档案、方案参考、相互作用提示、每日饮食建议与不良反应追踪。</p>
+            <p>版本与数据均保存在您使用的服务器环境中；修改患者信息或方案后请及时保存。</p>
+        </div>
+    </div>
+
+    <div class="panel" th:if="${loggedIn}">
+        <h2>账号</h2>
+        <form th:action="@{/settings/logout}" method="post" onsubmit="return confirm('确定退出登录？');">
+            <button type="submit" class="btn-out">退出登录</button>
+        </form>
+    </div>
+
+    <div class="footer"><a th:href="@{/home}">功能首页</a></div>
+</div>
+</body>
+</html>

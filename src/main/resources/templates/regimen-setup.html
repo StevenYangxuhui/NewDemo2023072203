@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>确认方案 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; box-sizing: border-box; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .panel {
+            background: #fff; border-radius: 14px; padding: 18px 16px; margin-bottom: 14px;
+            box-shadow: 0 2px 12px rgba(15,23,42,.08); border: 1px solid #e5e7eb;
+        }
+        .title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+        .sub { font-size: 14px; color: #6b7280; margin-bottom: 10px; }
+        .desc { font-size: 14px; color: #374151; line-height: 1.55; }
+        .hint-box {
+            background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px;
+            font-size: 13px; color: #92400e; line-height: 1.5; margin-top: 12px;
+        }
+        .form-title { font-size: 16px; font-weight: 600; color: #111827; margin: 18px 0 10px; }
+        .form-item { margin-bottom: 14px; }
+        .form-item label { display: block; font-size: 14px; color: #374151; margin-bottom: 6px; line-height: 1.4; }
+        .hint-under { font-size: 12px; color: #9ca3af; margin-top: 4px; line-height: 1.4; }
+        input, textarea {
+            width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+        textarea { min-height: 64px; resize: vertical; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .btn {
+            padding: 12px 22px; border-radius: 999px; font-size: 15px; font-weight: 600; border: none; cursor: pointer;
+            text-decoration: none; display: inline-block; text-align: center;
+        }
+        .btn-primary { background: linear-gradient(135deg, #2563eb, #4f46e5); color: #fff; }
+        .btn-ghost { background: #f3f4f6; color: #374151; }
+        .flash { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="panel">
+        <div class="title" th:text="${template.title}">方案名</div>
+        <div class="sub" th:text="${template.subtitle}">副标题</div>
+        <div class="desc" th:text="${template.patientDescription}">说明</div>
+        <div class="hint-box" th:if="${template.typicalCycleDaysHint != null}">
+            小贴士：很多病友这类方案大约 <strong th:text="${template.typicalCycleDaysHint}">14</strong> 天算一个周期，但<strong>以您医院安排为准</strong>。
+        </div>
+        <div class="hint-box" th:if="${template.typicalCycleDaysHint == null and template.code != 'OTHER'}">
+            具体打针日子、药量都由医生决定，这里只帮您记个大概，方便提醒饮食。
+        </div>
+    </div>
+
+    <p th:if="${error}" class="flash" th:text="${error}"></p>
+
+    <form th:action="@{/regimen/setup/save}" method="post" class="panel">
+        <input type="hidden" name="templateCode" th:value="${template.code}">
+        <div class="form-title">下面几题不会填可以空着</div>
+
+        <div class="form-item" th:if="${template.code == 'OTHER'}">
+            <label for="customRegimenName">医生说的方案叫什么？（或写下主要药名） *</label>
+            <input id="customRegimenName" name="customRegimenName" required
+                   placeholder="例如：白蛋白紫杉醇单药、某某试验组…">
+            <p class="hint-under">用您听得懂的一句话就行，不用写全化学名。</p>
+        </div>
+
+        <div class="form-item">
+            <label for="startDate">第一次开始化疗的日期（若记得）</label>
+            <input id="startDate" type="date" name="startDate">
+            <p class="hint-under">不记得就空着，以后在「改日期/周期」里补。</p>
+        </div>
+
+        <div class="form-item">
+            <label for="totalCycles">医生一共计划做几个周期？</label>
+            <input id="totalCycles" type="number" name="totalCycles" min="1" max="99" placeholder="不知道可空着；出院小结上常有「共×周期」">
+            <p class="hint-under">出院小结或谈话里有时会写「化疗 × 6 周期」之类；不确定就空着。</p>
+        </div>
+
+        <div class="form-item">
+            <label for="currentCycle">现在做到第几个周期了？</label>
+            <input id="currentCycle" type="number" name="currentCycle" min="1" max="99" placeholder="不知道可空着">
+        </div>
+
+        <div class="form-item">
+            <label for="currentDay">在这个周期里是第几天？</label>
+            <input id="currentDay" type="number" name="currentDay" min="1" max="99" placeholder="不知道可空着">
+            <p class="hint-under">有的医院会在单子上写「第 1 天用药」；和 App 里「今日用药提示」有关，能填尽量填。</p>
+        </div>
+
+        <div class="form-item">
+            <label for="note">写一句给自己看的备注（可选）</label>
+            <textarea id="note" name="note" placeholder="例如：下次门诊带化验单"></textarea>
+        </div>
+
+        <div class="hint-box">
+            保存后，App 会按您选的方案生成一份<strong>参考用药清单</strong>，仅供对照学习，<strong>不能代替医生改药或停药</strong>。
+        </div>
+
+        <div class="actions">
+            <button type="submit" class="btn btn-primary">保存到我的方案</button>
+            <a th:href="@{/regimen/choose}" class="btn btn-ghost">返回重选</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

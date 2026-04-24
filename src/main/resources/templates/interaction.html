@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>营养-药物相互作用报告 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; }
+        .container { max-width: 720px; margin: 0 auto; }
+        .warn { background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #9a3412; line-height: 1.55; margin-bottom: 14px; }
+        .title { font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+        .sub { font-size: 14px; color: #4b5563; margin-bottom: 16px; line-height: 1.5; }
+        .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; font-size: 13px; }
+        .lg { padding: 6px 12px; border-radius: 999px; font-weight: 700; }
+        .lg.red { background: #fee2e2; color: #991b1b; }
+        .lg.yellow { background: #fef3c7; color: #92400e; }
+        .lg.green { background: #d1fae5; color: #047857; }
+        .section { margin-bottom: 18px; }
+        .section h3 { font-size: 15px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot.red { background: #dc2626; }
+        .dot.yellow { background: #f59e0b; }
+        .dot.green { background: #10b981; }
+        .card { background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid #e5e7eb; font-size: 14px; line-height: 1.5; color: #374151; }
+        .card strong { color: #111827; }
+        .empty { font-size: 14px; color: #6b7280; padding: 12px; background: #f9fafb; border-radius: 10px; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; }
+        .chip { font-size: 12px; padding: 4px 10px; background: #f3f4f6; border-radius: 999px; color: #374151; }
+        .rec { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 12px 14px; font-size: 14px; color: #065f46; line-height: 1.55; }
+        .footer { margin-top: 20px; text-align: center; }
+        .footer a { color: #2563eb; font-size: 14px; text-decoration: none; margin: 0 6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="warn">本报告根据您在 App 内保存的<strong>化疗参考药名</strong>与<strong>内置规则库</strong>生成，用于健康教育。<strong>具体能否食用、如何间隔，以医生、药师为准。</strong></div>
+    <div class="title">营养-药物相互作用报告</div>
+    <p class="sub">下面按 <strong>红 / 黄 / 绿</strong> 提示：红色倾向避免、黄色慎用或需注意间隔、绿色多为相对可接受或常规建议。</p>
+    <div class="legend">
+        <span class="lg red">红 · 避免 / 高风险</span>
+        <span class="lg yellow">黄 · 慎用 / 少吃 / 间隔</span>
+        <span class="lg green">绿 · 相对可 / 推荐方向</span>
+    </div>
+
+    <p class="sub" th:if="${drugs != null and !drugs.isEmpty()}">当前方案参考药名：</p>
+    <div class="chips" th:if="${drugs != null and !drugs.isEmpty()}">
+        <span class="chip" th:each="d : ${drugs}" th:text="${d}">药</span>
+    </div>
+    <p class="empty" th:if="${drugs == null or drugs.isEmpty()}">暂无参考药名，请先在「化疗方案」中保存方案。</p>
+
+    <div class="section">
+        <h3><span class="dot red"></span>红色 · 尽量避免自行使用</h3>
+        <p class="empty" th:if="${rulesAvoid == null or rulesAvoid.isEmpty()}">未匹配到「禁用倾向」条目（或规则库未覆盖您的药名）。</p>
+        <div th:each="r : ${rulesAvoid}" class="card" style="border-left:4px solid #dc2626;">
+            <strong th:text="${r.supplementName}">名</strong>
+            <div th:if="${r.reason != null}" th:text="${r.reason}" style="margin-top:6px;"></div>
+            <div th:if="${r.suggestion != null}" style="margin-top:6px;"><strong>间隔/注意：</strong><span th:text="${r.suggestion}"></span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3><span class="dot yellow"></span>黄色 · 慎用、少吃或需间隔</h3>
+        <p class="empty" th:if="${(rulesCaution == null or rulesCaution.isEmpty()) and (generalTips == null or generalTips.isEmpty())}">未匹配到慎用条目。</p>
+        <div th:each="r : ${rulesCaution}" class="card" style="border-left:4px solid #f59e0b;">
+            <strong th:text="${r.supplementName}">名</strong>
+            <div th:if="${r.reason != null}" th:text="${r.reason}" style="margin-top:6px;"></div>
+            <div th:if="${r.suggestion != null}" style="margin-top:6px;"><strong>建议：</strong><span th:text="${r.suggestion}"></span></div>
+        </div>
+        <div th:each="r : ${generalTips}" class="card" style="border-left:4px solid #f59e0b;">
+            <strong th:text="${r.supplementName}">名</strong> <span style="font-size:12px;color:#6b7280;">（通用提醒）</span>
+            <div th:if="${r.reason != null}" th:text="${r.reason}" style="margin-top:6px;"></div>
+            <div th:if="${r.suggestion != null}" style="margin-top:6px;"><strong>建议：</strong><span th:text="${r.suggestion}"></span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3><span class="dot green"></span>绿色 · 相对可接受 / 推荐方向</h3>
+        <p class="empty" th:if="${rulesSafe == null or rulesSafe.isEmpty()}">未单独列出「安全」类保健品条目时，可参考下列饮食原则。</p>
+        <div th:each="r : ${rulesSafe}" class="card" style="border-left:4px solid #10b981;">
+            <strong th:text="${r.supplementName}">名</strong>
+            <div th:if="${r.reason != null}" th:text="${r.reason}" style="margin-top:6px;"></div>
+            <div th:if="${r.suggestion != null}" style="margin-top:6px;"><strong>建议：</strong><span th:text="${r.suggestion}"></span></div>
+        </div>
+        <div class="rec" style="margin-top:10px;">
+            <strong>饮食推荐（一般原则）：</strong> 足量优质蛋白（鱼、蛋、豆制品）、易消化的主食（粥、软饭）、煮软的蔬菜；充足水分。个体耐受不同，以能吃下、不加重症状为准。
+        </div>
+    </div>
+
+    <div class="footer">
+        <a th:href="@{/supplement-check}">保健品自查</a>
+        <a th:href="@{/regimen}">化疗方案</a>
+        <a th:href="@{/home}">首页</a>
+    </div>
+</div>
+</body>
+</html>

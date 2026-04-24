@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>选择化疗方案 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; box-sizing: border-box; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .title { font-size: 20px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+        .intro {
+            font-size: 14px; color: #4b5563; line-height: 1.55; margin-bottom: 14px;
+            background: #fff; padding: 12px 14px; border-radius: 12px; border: 1px solid #e5e7eb;
+        }
+        .search-wrap { margin-bottom: 12px; }
+        .search-wrap input {
+            width: 100%; box-sizing: border-box; padding: 12px 14px; border-radius: 12px; border: 1px solid #d1d5db;
+            font-size: 15px;
+        }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+        .chip {
+            padding: 6px 12px; border-radius: 999px; font-size: 13px; border: 1px solid #e5e7eb;
+            background: #fff; cursor: pointer; color: #374151;
+        }
+        .chip.on { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+        .scheme-card {
+            display: block; text-decoration: none; color: inherit;
+            background: #fff; border-radius: 14px; padding: 14px 14px 16px; margin-bottom: 10px;
+            border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(15,23,42,.06);
+            transition: box-shadow .15s, transform .08s;
+        }
+        .scheme-card:hover { box-shadow: 0 4px 14px rgba(37,99,235,.2); transform: translateY(-1px); }
+        .scheme-card.other { border-style: dashed; background: #fafafa; }
+        .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: #eef2ff; color: #4338ca; margin-bottom: 6px; }
+        .scheme-title { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+        .scheme-sub { font-size: 13px; color: #6b7280; margin-bottom: 8px; }
+        .scheme-desc { font-size: 13px; color: #4b5563; line-height: 1.5; }
+        .pick-hint { font-size: 12px; color: #2563eb; margin-top: 8px; font-weight: 600; }
+        .footer { margin-top: 18px; text-align: center; }
+        .footer a { color: #2563eb; font-size: 14px; text-decoration: none; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="title">请选最像您的一种</div>
+    <p class="intro">
+        对照您手上的<strong>化疗单、出院小结或医生口头说法</strong>，选<strong>最接近</strong>的一项即可，不必完全一样。
+        选好后下一页只有几道简单问题，不会让您填专业药物剂量。
+    </p>
+    <div class="search-wrap">
+        <label for="q" style="display:none;">搜索</label>
+        <input type="search" id="q" placeholder="输入关键字，例如：奥沙利铂、乳腺、淋巴瘤…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips">
+        <button type="button" class="chip on" data-cat="all">全部</button>
+        <button type="button" class="chip" th:each="lab : ${categoryLabels}" th:text="${lab}" th:attr="data-cat=${lab}">分类</button>
+    </div>
+    <div id="card-list">
+        <a th:each="t : ${templates}"
+           th:href="@{/regimen/setup(templateCode=${t.code})}"
+           class="scheme-card"
+           th:classappend="${t.code == 'OTHER'} ? ' other'"
+           th:attr="data-cat=${t.categoryLabel}"
+           th:data-search="|${t.title} ${t.subtitle} ${t.patientDescription}|">
+            <span class="badge" th:text="${t.categoryLabel}">分类</span>
+            <div class="scheme-title" th:text="${t.title}">标题</div>
+            <div class="scheme-sub" th:text="${t.subtitle}">副标题</div>
+            <div class="scheme-desc" th:text="${t.patientDescription}">说明</div>
+            <div class="pick-hint">点这里继续 →</div>
+        </a>
+    </div>
+    <div class="footer">
+        <a th:href="@{/regimen}">← 返回我的方案</a>
+    </div>
+</div>
+<script>
+(function () {
+    var q = document.getElementById('q');
+    var chips = document.getElementById('chips');
+    var cat = 'all';
+    function norm(s) { return (s || '').toLowerCase(); }
+    function apply() {
+        var term = norm(q.value).trim();
+        document.querySelectorAll('.scheme-card').forEach(function (card) {
+            var c = card.getAttribute('data-cat');
+            var hay = norm(card.getAttribute('data-search'));
+            var okCat = (cat === 'all' || c === cat);
+            var okQ = !term || hay.indexOf(term) !== -1;
+            card.classList.toggle('hidden', !(okCat && okQ));
+        });
+    }
+    q.addEventListener('input', apply);
+    chips.addEventListener('click', function (e) {
+        var btn = e.target.closest('.chip');
+        if (!btn) return;
+        chips.querySelectorAll('.chip').forEach(function (b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        cat = btn.getAttribute('data-cat') || 'all';
+        apply();
+    });
+})();
+</script>
+</body>
+</html>

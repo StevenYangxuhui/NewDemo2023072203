@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>不良反应记录 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; box-sizing: border-box; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .intro { font-size: 14px; color: #4b5563; line-height: 1.55; background: #fff; padding: 12px 14px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 14px; }
+        .head-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .title { font-size: 20px; font-weight: 600; color: #111827; }
+        .btn { display: inline-block; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 600; text-decoration: none; background: linear-gradient(135deg,#2563eb,#4f46e5); color: #fff; }
+        .btn-ghost { background: #fff; color: #374151; border: 1px solid #e5e7eb; }
+        .flash { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .card { background: #fff; border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+        .type { font-weight: 700; color: #111827; font-size: 16px; }
+        .meta { font-size: 13px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
+        .actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-sm { padding: 6px 12px; font-size: 13px; border-radius: 999px; text-decoration: none; border: none; cursor: pointer; }
+        .empty { text-align: center; padding: 28px; color: #6b7280; background: #fff; border-radius: 14px; border: 1px dashed #e5e7eb; }
+        .footer { margin-top: 18px; text-align: center; }
+        .footer a { color: #2563eb; font-size: 14px; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <p class="intro">简单记下<strong>哪一天、哪种不舒服</strong>，方便以后给医生看。保存后系统会<strong>尝试合并到当日「每日营养方案」</strong>（恶心、腹泻、口腔炎等），您可在每日营养页查看或再手动调整。不知道严不严重也可以先记一笔。</p>
+    <div class="head-row">
+        <div class="title">不良反应记录</div>
+        <a th:href="@{/reaction/edit}" class="btn">＋ 记一条</a>
+    </div>
+    <p th:if="${error}" class="flash" th:text="${error}"></p>
+    <div th:if="${reactions == null or reactions.isEmpty()}" class="empty">还没有记录。点「记一条」开始。</div>
+    <div th:each="r : ${reactions}" class="card">
+        <div class="type" th:text="${r.reactionType}">类型</div>
+        <div class="meta">
+            <div>日期：<span th:text="${#temporals.format(r.recordDate, 'yyyy-MM-dd')}">—</span></div>
+            <div th:if="${r.severity != null}">难受程度（1～5）：<span th:text="${r.severity}">—</span></div>
+            <div th:if="${r.detail != null and !r.detail.isEmpty()}">补充：<span th:text="${r.detail}">—</span></div>
+        </div>
+        <div class="actions">
+            <a class="btn-sm btn-ghost" th:href="@{/reaction/edit(id=${r.id})}" style="border:1px solid #e5e7eb;">修改</a>
+            <form th:action="@{/reaction/delete}" method="post" style="display:inline;" onsubmit="return confirm('删除这条记录？');">
+                <input type="hidden" name="id" th:value="${r.id}">
+                <button type="submit" class="btn-sm" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;">删除</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer"><a th:href="@{/home}">← 功能首页</a></div>
+</div>
+</body>
+</html>

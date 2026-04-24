@@ -2,21 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>心情记录列表</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
-            padding: 20px;
+            padding: 12px;
         }
         .container {
             max-width: 1000px;
             margin: 0 auto;
             background-color: white;
-            padding: 30px;
+            padding: 20px 12px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
         h1 {
             color: #333;
@@ -85,6 +87,25 @@
         .action-buttons a {
             margin-right: 5px;
         }
+        .button-warning {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .button-warning:hover {
+            background-color: #e0a800;
+        }
+        .button-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .visibility-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .visibility-status {
+            min-width: 60px;
+        }
     </style>
 </head>
 <body>
@@ -101,9 +122,11 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>提交者</th>
                         <th>发生的事</th>
                         <th>心情</th>
                         <th>对方形象</th>
+                        <th>可见性</th>
                         <th>创建时间</th>
                         <th>操作</th>
                     </tr>
@@ -111,14 +134,48 @@
                 <tbody>
                     <tr th:each="record : ${records}">
                         <td th:text="${record.id}">1</td>
+                        <td>
+                            <span th:text="${record.submitter}" 
+                                  th:style="${record.submitter == currentSubmitter ? 'color: #007bff; font-weight: bold;' : 'color: #28a745;'}">
+                                submitter
+                            </span>
+                        </td>
                         <td th:text="${record.happenThing != null ? record.happenThing : '(无)'}">发生的事</td>
                         <td th:text="${record.mood != null ? record.mood : '(无)'}">心情</td>
                         <td th:text="${record.partnerImage != null ? record.partnerImage : '(无)'}">对方形象</td>
+                        <td>
+                            <!-- 自己的记录：显示状态和切换按钮 -->
+                            <div th:if="${record.submitter == currentSubmitter}" class="visibility-cell">
+                                <span class="visibility-status">
+                                    <span th:if="${record.isPublic != null and record.isPublic}" 
+                                          style="color: #28a745; font-weight: bold;">✓ 公开</span>
+                                    <span th:if="${record.isPublic == null or !record.isPublic}" 
+                                          style="color: #6c757d;">仅自己</span>
+                                </span>
+                                <a th:href="@{/mood/toggle-visibility(id=${record.id})}" 
+                                   class="button button-warning button-small"
+                                   th:text="${record.isPublic != null and record.isPublic ? '设为仅自己' : '设为公开'}"
+                                   onclick="return confirm('确定要切换这条记录的可见性吗？')">
+                                    切换
+                                </a>
+                            </div>
+                            <!-- 对方的记录：只显示状态 -->
+                            <div th:if="${record.submitter != currentSubmitter}">
+                                <span th:if="${record.isPublic != null and record.isPublic}" 
+                                      style="color: #28a745; font-weight: bold;">✓ 公开</span>
+                                <span th:if="${record.isPublic == null or !record.isPublic}" 
+                                      style="color: #6c757d;">仅自己</span>
+                            </div>
+                        </td>
                         <td th:text="${#temporals.format(record.createTime, 'yyyy-MM-dd HH:mm:ss')}">2026-01-23 15:00:00</td>
                         <td class="action-buttons">
-                            <a th:href="@{/mood/delete(id=${record.id})}" 
-                               class="button button-danger" 
+                            <!-- 只能删除自己的记录 -->
+                            <a th:if="${record.submitter == currentSubmitter}"
+                               th:href="@{/mood/delete(id=${record.id})}" 
+                               class="button button-danger button-small" 
                                onclick="return confirm('确定要删除这条记录吗？')">删除</a>
+                            <span th:if="${record.submitter != currentSubmitter}" 
+                                  style="color: #999; font-size: 12px;">不可操作</span>
                         </td>
                     </tr>
                 </tbody>

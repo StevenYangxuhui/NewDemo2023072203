@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>用药参考 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 16px; box-sizing: border-box; }
+        .container { max-width: 640px; margin: 0 auto; }
+        .warn {
+            background: #fff7ed; border: 1px solid #fdba74; border-radius: 12px; padding: 12px 14px;
+            font-size: 14px; color: #9a3412; line-height: 1.55; margin-bottom: 14px;
+        }
+        .head-row { margin-bottom: 12px; }
+        .title { font-size: 19px; font-weight: 700; color: #111827; }
+        .sub { font-size: 13px; color: #6b7280; margin-top: 4px; }
+        .flash { padding: 10px 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .card {
+            background: #fff; border-radius: 12px; padding: 14px 12px; margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(15,23,42,.08); border: 1px solid #e5e7eb;
+        }
+        .drug { font-weight: 700; color: #111827; font-size: 15px; margin-bottom: 6px; }
+        .line { font-size: 13px; color: #4b5563; line-height: 1.5; }
+        .empty { text-align: center; padding: 22px; color: #6b7280; font-size: 14px; background: #fff; border-radius: 12px; border: 1px dashed #e5e7eb; margin-bottom: 12px; }
+        .footer { margin-top: 18px; }
+        .footer a { color: #2563eb; font-size: 14px; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="warn">
+        <strong>重要：</strong>下面是根据您选的方案类型整理的<strong>常见用药说明</strong>，用于帮您<strong>对照、理解</strong>。
+        <strong>真实打针时间、剂量、顺序必须以医院医嘱和药袋为准。</strong>不要自行加减药。
+    </div>
+    <div class="head-row">
+        <div class="title" th:text="${regimenCatalog.resolveListTitle(regimen)}">方案</div>
+        <div class="sub">
+            <span th:if="${regimenCatalog.resolveSubtitle(regimen) != null}" th:text="${regimenCatalog.resolveSubtitle(regimen)}"></span>
+            <span th:if="${regimenCatalog.resolveSubtitle(regimen) == null}" th:text="${regimen.regimenName}"></span>
+        </div>
+    </div>
+    <p th:if="${error}" class="flash" th:text="${error}"></p>
+    <div th:if="${medications == null or medications.isEmpty()}" class="empty">
+        您选的是「其他方案」或尚未生成参考清单。请对照医院的用药单，如有疑问问主治医生或护士。
+    </div>
+    <div th:each="m : ${medications}" class="card">
+        <div class="drug" th:text="${m.drugName}">药名</div>
+        <div class="line" th:if="${m.dose != null}"><strong>剂量说明</strong>：<span th:text="${m.dose}">—</span></div>
+        <div class="line" th:if="${m.route != null}"><strong>怎么用</strong>：<span th:text="${m.route}">—</span></div>
+        <div class="line" th:if="${m.frequency != null}"><strong>频次</strong>：<span th:text="${m.frequency}">—</span></div>
+        <div class="line" th:if="${m.dayInCycle != null}"><strong>周期里大致第几天</strong>（示例）：第 <span th:text="${m.dayInCycle}">—</span> 天</div>
+        <div class="line" th:if="${m.remark != null}"><strong>提示</strong>：<span th:text="${m.remark}">—</span></div>
+    </div>
+    <div class="footer">
+        <a th:href="@{/regimen}">← 返回我的方案</a>
+    </div>
+</div>
+</body>
+</html>

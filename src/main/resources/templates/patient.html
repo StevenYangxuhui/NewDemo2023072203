@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>患者信息 · CancerApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
+            padding: 20px 18px 18px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+        }
+        .subtitle {
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            color: #4b5563;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px 16px;
+            font-size: 14px;
+        }
+        .label {
+            color: #6b7280;
+        }
+        .value {
+            color: #111827;
+            font-weight: 500;
+        }
+        .empty {
+            color: #9ca3af;
+            font-style: italic;
+        }
+        .btn-row {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 999px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary {
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border: none;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+        }
+        .btn-secondary {
+            color: #111827;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <div class="title">患者信息</div>
+                <div class="subtitle" th:text="'当前登录：' + ${name}">当前登录：张三</div>
+            </div>
+        </div>
+
+        <div class="section-title">基本信息</div>
+        <div class="info-grid">
+            <div>
+                <span class="label">姓名：</span>
+                <span class="value" th:text="${patient != null} ? ${patient.name} : ${name}">张三</span>
+            </div>
+            <div>
+                <span class="label">性别：</span>
+                <span th:if="${patient} != null and patient.gender != null" class="value" th:text="${patient.gender}">M</span>
+                <span th:if="${patient} == null or patient.gender == null" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">年龄：</span>
+                <span th:if="${patient != null and patient.age != null}" class="value" th:text="${patient.age} + ' 岁'">40 岁</span>
+                <span th:if="${patient == null or patient.age == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">身高：</span>
+                <span th:if="${patient != null and patient.heightCm != null}" class="value" th:text="${patient.heightCm} + ' cm'">165 cm</span>
+                <span th:if="${patient == null or patient.heightCm == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">体重：</span>
+                <span th:if="${patient != null and patient.weightKg != null}" class="value" th:text="${patient.weightKg} + ' kg'">55 kg</span>
+                <span th:if="${patient == null or patient.weightKg == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">肿瘤类型：</span>
+                <span th:if="${patient != null and patient.tumorType != null}" class="value" th:text="${patient.tumorType}">结直肠癌</span>
+                <span th:if="${patient == null or patient.tumorType == null}" class="empty">尚未填写</span>
+            </div>
+        </div>
+
+        <div class="section-title">临床情况</div>
+        <div class="info-grid">
+            <div>
+                <span class="label">肝功能：</span>
+                <span th:if="${patient != null and patient.liverFunction != null}" class="value" th:text="${patient.liverFunction}">Child-Pugh A</span>
+                <span th:if="${patient == null or patient.liverFunction == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">肾功能：</span>
+                <span th:if="${patient != null and patient.kidneyFunction != null}" class="value" th:text="${patient.kidneyFunction}">eGFR > 60</span>
+                <span th:if="${patient == null or patient.kidneyFunction == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">过敏史：</span>
+                <span th:if="${patient != null and patient.allergyHistory != null}" class="value" th:text="${patient.allergyHistory}">青霉素过敏</span>
+                <span th:if="${patient == null or patient.allergyHistory == null}" class="empty">尚未填写</span>
+            </div>
+            <div>
+                <span class="label">饮食禁忌：</span>
+                <span th:if="${patient != null and patient.dietTaboo != null}" class="value" th:text="${patient.dietTaboo}">海鲜、辛辣</span>
+                <span th:if="${patient == null or patient.dietTaboo == null}" class="empty">尚未填写</span>
+            </div>
+        </div>
+
+        <div class="section-title">营养需求估算</div>
+        <div class="info-grid" style="grid-template-columns: 1fr;">
+            <div>
+                <span class="label">估算热量与蛋白质：</span>
+                <span th:if="${patient != null and patient.kcalNeed != null}" class="value">
+                    约 <span th:text="${patient.kcalNeed}"></span> kcal/日 · 蛋白质约 <span th:text="${patient.proteinNeedG}"></span> g/日
+                </span>
+                <span th:if="${patient == null or patient.kcalNeed == null}" class="empty">保存完整年龄、性别、身高、体重后自动计算（仅供参考）</span>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <a th:href="@{/patient/edit}" class="btn-primary">填写 / 修改基本信息</a>
+            <a th:href="@{/home}" class="btn-secondary">返回功能首页</a>
+        </div>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>出错了 · CancerApp</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 24px 16px; box-sizing: border-box; min-height: 100vh; }
+        .box { max-width: 520px; margin: 0 auto; background: #fff; border-radius: 14px; padding: 24px 20px; box-shadow: 0 4px 18px rgba(15,23,42,.12); border: 1px solid #e5e7eb; }
+        h1 { font-size: 20px; color: #111827; margin: 0 0 12px; }
+        .code { font-size: 14px; color: #6b7280; margin-bottom: 12px; }
+        .msg { font-size: 14px; color: #374151; line-height: 1.55; word-break: break-word; background: #f9fafb; padding: 12px; border-radius: 10px; border: 1px solid #e5e7eb; margin-bottom: 16px; white-space: pre-wrap; }
+        .hint { font-size: 13px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; padding: 10px 12px; border-radius: 10px; margin-bottom: 16px; line-height: 1.5; }
+        a { display: inline-block; margin-right: 12px; margin-top: 8px; color: #2563eb; font-size: 14px; font-weight: 600; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>暂时无法打开页面</h1>
+    <p class="code" th:if="${status}">
+        状态码：<span th:text="${status}">500</span>
+        <span th:if="${error}" th:text="'（' + ${error} + '）'"></span>
+    </p>
+    <p class="msg" th:if="${message != null and !message.isEmpty()}" th:text="${message}">错误说明</p>
+    <p class="msg" th:if="${message == null or message.isEmpty()}">系统出现异常，请稍后再试。若刚升级过程序，请确认已执行数据库升级脚本。</p>
+    <div class="hint" th:if="${message != null and #strings.contains(message, 'template_code')}">
+        若提示缺少 <code>template_code</code> 列：请在 MySQL 中执行项目里的
+        <code>src/main/resources/db/migration_add_regimen_template_code.sql</code>。
+    </div>
+    <a th:href="@{/home}">功能首页</a>
+    <a th:href="@{/}">欢迎页</a>
+</div>
+</body>
+</html>

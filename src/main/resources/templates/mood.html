@@ -2,15 +2,29 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>心情记录表单</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
         .container {
-            width: 550px;
-            margin: 50px auto;
-            padding: 25px;
+            width: 100%;
+            max-width: 550px;
+            padding: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            background-color: #ffffff;
         }
         .form-item {
             margin-bottom: 20px;
@@ -35,6 +49,16 @@
             border-color: #007bff;
             box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
         }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+            transform: scale(1.2);
+        }
+        small {
+            color: #666;
+            font-size: 12px;
+        }
         button {
             width: 100%;
             padding: 12px;
@@ -49,31 +73,235 @@
         button:hover {
             background-color: #0056b3;
         }
+        /* 输入框 + 右侧表情按钮整体容器 */
+        .input-with-emoji {
+            position: relative;
+        }
+        .input-with-emoji input {
+            width: 100%;
+            padding-right: 36px; /* 给右侧小表情按钮留空间 */
+        }
+        /* 右侧表情小图标按钮 */
+        .emoji-trigger {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: transparent;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+        }
+        .emoji-trigger:hover {
+            background: rgba(0,0,0,0.04);
+            border-radius: 50%;
+        }
+        /* 表情选择框（类似输入法 emoji 模块）*/
+        .emoji-picker-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .emoji-picker-overlay.show {
+            display: flex;
+        }
+        .emoji-picker-box {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            width: 360px;
+            max-width: 95vw;
+            max-height: 420px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .emoji-picker-title {
+            padding: 12px 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+        }
+        .emoji-picker-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .emoji-picker-tabs span {
+            padding: 4px 10px;
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .emoji-picker-tabs span:hover,
+        .emoji-picker-tabs span.active {
+            background: #e8f4ff;
+            color: #007bff;
+        }
+        .emoji-picker-body {
+            padding: 12px;
+            overflow-y: auto;
+            max-height: 280px;
+        }
+        .emoji-category {
+            display: none;
+        }
+        .emoji-category.show {
+            display: block;
+        }
+        .emoji-category h4 {
+            font-size: 12px;
+            color: #999;
+            margin: 8px 0 6px 0;
+        }
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 4px;
+        }
+        .emoji-grid span {
+            font-size: 22px;
+            text-align: center;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+        .emoji-grid span:hover {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2 style="text-align: center; color: #333; margin-bottom: 30px;">心情记录</h2>
-        <!-- 表单核心：提交到 /mood/submit，请求方式为 POST -->
         <form th:action="@{/mood/submit}" method="post">
-            <!-- 第一个输入框：发生的事 -->
             <div class="form-item">
                 <label for="happenThing">发生的事：</label>
-                <input type="text" id="happenThing" name="happenThing" placeholder="请输入发生的事（可选）">
+                <div class="input-with-emoji">
+                    <input type="text" id="happenThing" name="happenThing" placeholder="请输入发生的事（可选）">
+                    <button type="button" class="emoji-trigger" data-target="happenThing">😊</button>
+                </div>
             </div>
-            <!-- 第二个输入框：现在的心情 -->
             <div class="form-item">
                 <label for="mood">现在的心情：</label>
-                <input type="text" id="mood" name="mood" placeholder="请输入你的心情（可选）">
+                <div class="input-with-emoji">
+                    <input type="text" id="mood" name="mood" placeholder="请输入你的心情（可选）">
+                    <button type="button" class="emoji-trigger" data-target="mood">😊</button>
+                </div>
             </div>
-            <!-- 第三个输入框：心中对方的形象 -->
             <div class="form-item">
                 <label for="partnerImage">心中对方的形象：</label>
-                <input type="text" id="partnerImage" name="partnerImage" placeholder="请输入心中对方的形象（可选）">
+                <div class="input-with-emoji">
+                    <input type="text" id="partnerImage" name="partnerImage" placeholder="请输入心中对方的形象（可选）">
+                    <button type="button" class="emoji-trigger" data-target="partnerImage">😊</button>
+                </div>
+            </div>
+            <!-- 新功能：可见性设置 -->
+            <div class="form-item">
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="isPublic" name="isPublic" value="true" style="width: auto; margin-right: 8px;">
+                    <span>允许对方查看此记录</span>
+                </label>
+                <small style="color: #666; font-size: 12px; margin-left: 24px; display: block; margin-top: 4px;">
+                    勾选后，对方可以看到这条记录；不勾选则仅自己可见
+                </small>
             </div>
             <!-- 提交按钮 -->
             <button type="submit">提交记录</button>
         </form>
     </div>
+
+    <!-- Emoji 选择框（类似输入法表情模块）-->
+    <div id="emojiPickerOverlay" class="emoji-picker-overlay">
+        <div class="emoji-picker-box" onclick="event.stopPropagation()">
+            <div class="emoji-picker-title">选择表情 · 插入到「<span id="emojiTargetLabel"></span>」</div>
+            <div class="emoji-picker-tabs" id="emojiTabs"></div>
+            <div class="emoji-picker-body" id="emojiBody"></div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+    (function() {
+        // 分类 emoji（类似输入法表情模块）
+        var EMOJI_DATA = {
+            '表情': ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','🙃','😉','😊','😇','🥰','😍','🤩','😘','😗','☺','😚','😙','🥲','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤮','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','🥸'],
+            '手势': ['👍','👎','👊','✊','🤛','🤜','🤞','✌','🤟','🤘','👌','🤌','🤏','👈','👉','👆','👇','☝','✋','🤚','🖐','🖖','👋','🤙','💪','🦾','🖕','🙏','🦶','🦵','🦿','💋','💘','💝','💖','💗','💓','💞','💕','💟','❣','💔','❤','🧡','💛','💚','💙','💜','🖤','🤍','🤎'],
+            '爱心与符号': ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮','✝','☪','🕉','☸','✡','🔯','🕎','☯','☦','🛐','⛎','♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓','🆔','⚛','🉑','☢','☣','📴','📳','🈶','🈚','🈸','🈺','🈷','✴','🆚','💮','🉐','㊙','㊗','🈴','🈵','🈹','🈲','🅰','🅱','🆎','🆑','🅾','🆘','❌','⭕','🛑','⛔','📛','🚫','💯','💢','♨','🚷','🚯','🚳','🚱','🔞','📵','🚭','❗','❕','❓','❔','‼','⁉','🔅','🔆','〽','⚠','🚸','🔱','⚜','🔰','♻','✅','🈯','💹','❇','✳','❎','🌐','💠','Ⓜ','🌀','💤','🏧','🚾','♿','🅿','🛗','🈳','🈂','🛂','🛃','🛄','🛅'],
+            '动物': ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐔','🐧','🐦','🐤','🐣','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦟','🦗','🕷','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊'],
+            '食物': ['🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🦴','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜'],
+            '活动': ['⚽','🏀','🏈','⚾','🥎','🎾','🏐','🏉','🥏','🎱','🪀','🏓','🏸','🏒','🏑','🥍','🏏','🪃','🥅','⛳','🪁','🏹','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸','🥌','🎿','⛷','🏂','🪂','🏋️','🤸','⛹️','🤾','🏌️','🏇','⛹','🤾','🏐','🏀','🏈','⚽','🎾','🏉','🎱','🏓','🏸','🥅','🏒','🏑','🥍','🏏','🪃','🥏','🎣','🤿','🥊','🥋','🎽','🛹','🛼','🛷','⛸','🥌','🎿','⛷','🏂','🪂','🏋','🤸','⛹','🤾','🏌','🏇']
+        };
+        var currentTargetId = '';
+        var overlay = document.getElementById('emojiPickerOverlay');
+        var targetLabel = document.getElementById('emojiTargetLabel');
+        var tabsEl = document.getElementById('emojiTabs');
+        var bodyEl = document.getElementById('emojiBody');
+
+        function openPicker(inputId) {
+            var labels = { happenThing: '发生的事', mood: '现在的心情', partnerImage: '心中对方的形象' };
+            currentTargetId = inputId;
+            targetLabel.textContent = labels[inputId] || inputId;
+            overlay.classList.add('show');
+            renderTabs();
+            renderCategory('表情');
+        }
+        function closePicker() {
+            overlay.classList.remove('show');
+        }
+        function renderTabs() {
+            tabsEl.innerHTML = '';
+            for (var cat in EMOJI_DATA) {
+                var span = document.createElement('span');
+                span.textContent = cat;
+                span.onclick = function() { renderCategory(this.textContent); tabsEl.querySelectorAll('span').forEach(function(s){ s.classList.remove('active'); }); this.classList.add('active'); };
+                tabsEl.appendChild(span);
+            }
+            tabsEl.firstElementChild && tabsEl.firstElementChild.classList.add('active');
+        }
+        function renderCategory(cat) {
+            var list = EMOJI_DATA[cat];
+            if (!list) return;
+            bodyEl.innerHTML = '<div class="emoji-category show"><h4>' + cat + '</h4><div class="emoji-grid" id="emojiGrid"></div></div>';
+            var grid = document.getElementById('emojiGrid');
+            list.forEach(function(emoji) {
+                var span = document.createElement('span');
+                span.textContent = emoji;
+                span.onclick = function() {
+                    var input = document.getElementById(currentTargetId);
+                    if (input) {
+                        var start = input.selectionStart || 0, end = input.selectionEnd || 0;
+                        var val = input.value || '';
+                        input.value = val.slice(0, start) + emoji + val.slice(end);
+                        input.focus();
+                    }
+                };
+                grid.appendChild(span);
+            });
+        }
+        overlay.onclick = closePicker;
+        document.querySelectorAll('.emoji-trigger').forEach(function(btn) {
+            btn.onclick = function() {
+                var id = this.getAttribute('data-target');
+                if (id) openPicker(id);
+            };
+        });
+        document.querySelectorAll('#happenThing, #mood, #partnerImage').forEach(function(input) {
+            input.addEventListener('focus', function() { currentTargetId = this.id; });
+        });
+    })();
+    </script>
 </body>
 </html>

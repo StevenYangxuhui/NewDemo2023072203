@@ -8,10 +8,10 @@
 		<version>3.5.10</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.yangsiqing</groupId>
-	<artifactId>record-app</artifactId>
+	<groupId>com.nfy</groupId>
+	<artifactId>cancer-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>record-app</name>
+	<name>CancerApp</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
+		<mybatis-plus.version>3.5.10</mybatis-plus.version>
 	</properties>
 	<dependencies>
 
@@ -37,36 +38,21 @@
 			<version>3.5.3</version>
 		</dependency>
 
-
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jdbc</artifactId>
-			
 		</dependency>
 
 		<dependency>
-    		<groupId>com.baomidou</groupId>
-    		<artifactId>mybatis-plus</artifactId>
-    		<version>3.5.15</version>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+			<version>${mybatis-plus.version}</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>3.0.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mybatis</groupId>
-					<artifactId>mybatis</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.33</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 
 		<dependency>
@@ -93,9 +79,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!-- 根据 application.properties 中的 spring.application.name 生成单个可执行 jar -->
-					<finalName>record-app</finalName>
-					<!-- 确保生成包含所有依赖的可执行 jar -->
+					<finalName>CancerApp</finalName>
 					<executable>true</executable>
 				</configuration>
 				<executions>
@@ -109,36 +93,13 @@
 		</plugins>
 	</build>
 
-
-
 	<dependencyManagement>
-	
-
 		<dependencies>
-
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-jdbc</artifactId>
 				<version>3.5.10</version>
 			</dependency>
-
-
-			
-
-
-			
-
-
-			
-
-
-			
-
-		
-
-			
-
 		</dependencies>
-
 	</dependencyManagement>
 </project>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>填写 / 修改患者信息 · CancerApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.12);
+            padding: 20px 18px 18px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #111827;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px 16px;
+        }
+        .form-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        label {
+            font-size: 13px;
+            color: #4b5563;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 8px 10px;
+            border-radius: 9px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+        }
+        .btn-row {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn-primary,
+        .btn-secondary {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-primary {
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            border: none;
+        }
+        .btn-secondary {
+            color: #111827;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+        }
+        .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .chip {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+        .chip input {
+            margin-right: 4px;
+        }
+        .inline-input {
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">填写 / 修改患者基本信息</div>
+        <form th:action="@{/patient/save}" method="post">
+            <div class="form-grid">
+                <div class="form-item">
+                    <label for="name">姓名</label>
+                    <input id="name" name="name" type="text" th:value="${patient.name}" readonly />
+                </div>
+                <div class="form-item">
+                    <label for="gender">性别</label>
+                    <select id="gender" name="gender" th:value="${patient.gender}">
+                        <option value="">未选择</option>
+                        <option value="M" th:selected="${patient.gender} == 'M'">男</option>
+                        <option value="F" th:selected="${patient.gender} == 'F'">女</option>
+                        <option value="U" th:selected="${patient.gender} == 'U'">不确定/其他</option>
+                    </select>
+                </div>
+                <div class="form-item">
+                    <label for="age">年龄（岁）</label>
+                    <input id="age" name="age" type="number" min="0" th:value="${patient.age}" />
+                </div>
+                <div class="form-item">
+                    <label for="heightCm">身高（cm）</label>
+                    <input id="heightCm" name="heightCm" type="number" step="0.1" min="0" th:value="${patient.heightCm}" />
+                </div>
+                <div class="form-item">
+                    <label for="weightKg">体重（kg）</label>
+                    <input id="weightKg" name="weightKg" type="number" step="0.1" min="0" th:value="${patient.weightKg}" />
+                </div>
+                <div class="form-item">
+                    <label for="tumorType">肿瘤类型</label>
+                    <select id="tumorType" name="tumorType">
+                        <option value="" th:selected="${patient.tumorType} == null">未选择</option>
+                        <option value="结直肠癌" th:selected="${patient.tumorType} == '结直肠癌'">结直肠癌</option>
+                        <option value="胃癌" th:selected="${patient.tumorType} == '胃癌'">胃癌</option>
+                        <option value="乳腺癌" th:selected="${patient.tumorType} == '乳腺癌'">乳腺癌</option>
+                        <option value="肺癌" th:selected="${patient.tumorType} == '肺癌'">肺癌</option>
+                        <option value="淋巴瘤" th:selected="${patient.tumorType} == '淋巴瘤'">淋巴瘤</option>
+                        <option value="其他" th:selected="${patient.tumorType} == '其他'">其他（在下方自填）</option>
+                    </select>
+                    <input id="tumorTypeOther" type="text"
+                           class="inline-input"
+                           placeholder="其他肿瘤类型"
+                           th:value="${patient.tumorType}"
+                           style="display:none;" />
+                </div>
+                <div class="form-item">
+                    <label for="liverFunction">肝功能情况</label>
+                    <select id="liverFunction" name="liverFunction">
+                        <option value="" th:selected="${patient.liverFunction} == null">未选择</option>
+                        <option value="正常" th:selected="${patient.liverFunction} == '正常'">正常</option>
+                        <option value="Child-Pugh A" th:selected="${patient.liverFunction} == 'Child-Pugh A'">Child-Pugh A</option>
+                        <option value="Child-Pugh B" th:selected="${patient.liverFunction} == 'Child-Pugh B'">Child-Pugh B</option>
+                        <option value="Child-Pugh C" th:selected="${patient.liverFunction} == 'Child-Pugh C'">Child-Pugh C</option>
+                        <option value="轻度受损" th:selected="${patient.liverFunction} == '轻度受损'">轻度受损</option>
+                        <option value="中度受损" th:selected="${patient.liverFunction} == '中度受损'">中度受损</option>
+                        <option value="重度受损" th:selected="${patient.liverFunction} == '重度受损'">重度受损</option>
+                        <option value="其他" th:selected="${patient.liverFunction} == '其他'">其他（在下方自填）</option>
+                    </select>
+                    <input id="liverFunctionOther" type="text"
+                           class="inline-input"
+                           placeholder="其他肝功能描述"
+                           th:value="${patient.liverFunction}"
+                           style="display:none;" />
+                </div>
+                <div class="form-item">
+                    <label for="kidneyFunction">肾功能情况</label>
+                    <select id="kidneyFunction" name="kidneyFunction">
+                        <option value="" th:selected="${patient.kidneyFunction} == null">未选择</option>
+                        <option value="正常" th:selected="${patient.kidneyFunction} == '正常'">正常</option>
+                        <option value="eGFR ≥ 60" th:selected="${patient.kidneyFunction} == 'eGFR ≥ 60'">eGFR ≥ 60</option>
+                        <option value="eGFR 30-59" th:selected="${patient.kidneyFunction} == 'eGFR 30-59'">eGFR 30-59</option>
+                        <option value="eGFR ＜ 30" th:selected="${patient.kidneyFunction} == 'eGFR ＜ 30'">eGFR ＜ 30</option>
+                        <option value="透析中" th:selected="${patient.kidneyFunction} == '透析中'">透析中</option>
+                        <option value="其他" th:selected="${patient.kidneyFunction} == '其他'">其他（在下方自填）</option>
+                    </select>
+                    <input id="kidneyFunctionOther" type="text"
+                           class="inline-input"
+                           placeholder="其他肾功能描述"
+                           th:value="${patient.kidneyFunction}"
+                           style="display:none;" />
+                </div>
+                <div class="form-item">
+                    <label>过敏史（勾选常见 + 可自填）</label>
+                    <div class="chip-row">
+                        <label class="chip">
+                            <input type="checkbox" value="青霉素" onclick="appendToField('allergyHistory', this)">青霉素
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="海鲜" onclick="appendToField('allergyHistory', this)">海鲜
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="花生" onclick="appendToField('allergyHistory', this)">花生
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="贝类" onclick="appendToField('allergyHistory', this)">贝类
+                        </label>
+                    </div>
+                    <textarea id="allergyHistory" name="allergyHistory" th:text="${patient.allergyHistory}" placeholder="可勾选上方常见选项，也可在此补充说明"></textarea>
+                </div>
+                <div class="form-item">
+                    <label>饮食禁忌（勾选常见 + 可自填）</label>
+                    <div class="chip-row">
+                        <label class="chip">
+                            <input type="checkbox" value="辛辣" onclick="appendToField('dietTaboo', this)">辛辣
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="油腻" onclick="appendToField('dietTaboo', this)">油腻
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="海鲜" onclick="appendToField('dietTaboo', this)">海鲜
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="柚子" onclick="appendToField('dietTaboo', this)">柚子
+                        </label>
+                        <label class="chip">
+                            <input type="checkbox" value="酒精" onclick="appendToField('dietTaboo', this)">酒精
+                        </label>
+                    </div>
+                    <textarea id="dietTaboo" name="dietTaboo" th:text="${patient.dietTaboo}" placeholder="可勾选上方常见选项，也可在此补充说明"></textarea>
+                </div>
+                </div>
+            </div>
+
+            <div style="margin-top:14px;padding:12px 14px;background:#f0fdf4;border-radius:12px;border:1px solid #bbf7d0;font-size:13px;color:#166534;line-height:1.55;">
+                <strong>营养需求自动估算</strong>（保存时写入，仅供参考，个体以医护评估为准）<br>
+                <span th:if="${patient.kcalNeed != null}">
+                    约 <strong th:text="${patient.kcalNeed}"></strong> kcal/日 · 蛋白质约 <strong th:text="${patient.proteinNeedG}"></strong> g/日
+                </span>
+                <span th:if="${patient.kcalNeed == null}">请填写<strong>年龄、性别、身高、体重</strong>后点击保存，系统将按常用公式估算。</span>
+            </div>
+
+            <div class="btn-row">
+                <button type="submit" class="btn-primary">提交保存</button>
+                <a th:href="@{/patient}" class="btn-secondary">返回患者信息</a>
+            </div>
+        </form>
+    </div>
+</body>
+<script>
+    function toggleOther(selectId, otherInputId) {
+        var select = document.getElementById(selectId);
+        var input = document.getElementById(otherInputId);
+        if (!select || !input) return;
+        if (select.value === '其他') {
+            input.style.display = 'block';
+        } else {
+            input.style.display = 'none';
+        }
+    }
+
+    function appendToField(textareaId, checkbox) {
+        var ta = document.getElementById(textareaId);
+        if (!ta) return;
+        var value = checkbox.value;
+        var current = ta.value || '';
+        if (checkbox.checked) {
+            if (current.indexOf(value) === -1) {
+                if (current.trim().length > 0 && !current.trim().endsWith('；')) {
+                    current = current.trim() + '；';
+                }
+                ta.value = current + value + '；';
+            }
+        } else {
+            ta.value = current.replace(new RegExp(value + '；?', 'g'), '').trim();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleOther('tumorType', 'tumorTypeOther');
+        toggleOther('liverFunction', 'liverFunctionOther');
+        toggleOther('kidneyFunction', 'kidneyFunctionOther');
+
+        document.getElementById('tumorType').addEventListener('change', function () {
+            toggleOther('tumorType', 'tumorTypeOther');
+        });
+        document.getElementById('liverFunction').addEventListener('change', function () {
+            toggleOther('liverFunction', 'liverFunctionOther');
+        });
+        document.getElementById('kidneyFunction').addEventListener('change', function () {
+            toggleOther('kidneyFunction', 'kidneyFunctionOther');
+        });
+    });
+</script>
+</html>
+
